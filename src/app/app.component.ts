@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FutbolService } from './services/futbol.service';
-import { Competicion } from './models/futbol.model';
+import { FutbolService } from './services/futbol.service'; // <-- Asegurate de que tenga el './'
+import { Competicion } from './models/futbol.model';       // <-- Asegurate de que tenga el './'
 import { debounceTime, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './app.component.html', // <-- Asegurate de que diga esto y NO "template: `...`"
+  templateUrl: './app.component.html',
   styles: []
 })
 export class AppComponent implements OnInit {
