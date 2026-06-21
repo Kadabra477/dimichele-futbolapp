@@ -1,7 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 body {
-  @apply bg-slate-900 text-slate-100 font-sans min-h-screen;
+  background-color: #0f172a; /* Equivalente exacto a bg-slate-900 */
+  color: #f1f5f9;            /* Equivalente exacto a text-slate-100 */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  min-height: 100vh;
 }
