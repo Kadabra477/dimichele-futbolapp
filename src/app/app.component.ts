@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FutbolService } from './services/futbol.service'; // <-- Asegurate de que tenga el './'
-import { Competicion } from './models/futbol.model';       // <-- Asegurate de que tenga el './'
+import { FutbolService } from './services/futbol.service';
+import { Competicion } from './models/futbol.model';
 import { debounceTime, startWith } from 'rxjs/operators';
 
 @Component({
@@ -14,22 +14,28 @@ import { debounceTime, startWith } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit {
   formularioBusqueda: FormGroup;
-  competiciones: Competicion[] = [];
-  competicionesFiltradas: Competicion[] = [];
+  ligas: Competicion[] = [];
+  ligasFiltradas: Competicion[] = [];
+  ligaSeleccionada: Competicion | null = null;
   cargando = true;
 
   constructor(private fb: FormBuilder, private futbolService: FutbolService) {
     this.formularioBusqueda = this.fb.group({
       busqueda: [''],
-      regionSeleccionada: ['todas']
+      paisSeleccionado: ['todos'],
+      tipoSeleccionado: ['todos']
     });
   }
 
   ngOnInit(): void {
-    this.futbolService.obtenerCompeticiones().subscribe({
+    this.futbolService.obtenerLigas().subscribe({
       next: (datos) => {
-        this.competiciones = datos.competiciones;
-        this.competicionesFiltradas = datos.competiciones;
+        this.ligas = datos;
+        this.ligasFiltradas = datos;
+        // Seleccionamos la primera por defecto estilo Promiedos
+        if (datos.length > 0) {
+          this.ligaSeleccionada = datos[0];
+        }
         this.cargando = false;
         this.configurarFiltros();
       },
@@ -42,17 +48,31 @@ export class AppComponent implements OnInit {
   configurarFiltros(): void {
     this.formularioBusqueda.valueChanges
       .pipe(
-        startWith({ busqueda: '', regionSeleccionada: 'todas' }),
-        debounceTime(200)
+        startWith({ busqueda: '', paisSeleccionado: 'todos', tipoSeleccionado: 'todos' }),
+        debounceTime(150)
       )
-      .subscribe(({ busqueda, regionSeleccionada }) => {
-        this.competicionesFiltradas = this.competiciones.filter(comp => {
-          const coincideBusqueda = comp.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
-                                   comp.codigo.toLowerCase().includes(busqueda.toLowerCase());
-          const coincideRegion = regionSeleccionada === 'todas' || 
-                                 comp.region.nombre.toLowerCase() === regionSeleccionada.toLowerCase();
-          return coincideBusqueda && coincideRegion;
+      .subscribe(({ busqueda, paisSeleccionado, tipoSeleccionado }) => {
+        this.ligasFiltradas = this.ligas.filter(liga => {
+          const coincideBusqueda = liga.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
+                                   liga.codigo.toLowerCase().includes(busqueda.toLowerCase());
+          
+          const coincidePais = paisSeleccionado === 'todos' || 
+                               liga.pais.toLowerCase() === paisSeleccionado.toLowerCase();
+          
+          const coincideTipo = tipoSeleccionado === 'todos' || 
+                               liga.tipo.toLowerCase() === tipoSeleccionado.toLowerCase();
+
+          return coincideBusqueda && coincidePais && coincideTipo;
         });
+
+        // Si la liga que estaba seleccionada ya no está en el filtro, limpiamos la vista o ponemos la primera disponible
+        if (this.ligaSeleccionada && !this.ligasFiltradas.includes(this.ligaSeleccionada)) {
+          this.ligaSeleccionada = this.ligasFiltradas.length > 0 ? this.ligasFiltradas[0] : null;
+        }
       });
+  }
+
+  seleccionarLiga(liga: Competicion): void {
+    this.ligaSeleccionada = liga;
   }
 }
