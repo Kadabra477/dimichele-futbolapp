@@ -1,0 +1,86 @@
+<div class="min-h-screen bg-slate-900 text-slate-100">
+  <!-- Barra de Navegación / Encabezado -->
+  <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">⚽</span>
+        <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          Plataforma Fútbol Arena
+        </h1>
+      </div>
+      <div class="text-xs text-slate-400 font-mono bg-slate-800 px-2 py-1 rounded">
+        Angular v21
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Sección del Formulario de Búsqueda -->
+    <section class="bg-slate-800/40 border border-slate-800 rounded-xl p-6 mb-8 backdrop-blur">
+      <form [formGroup]="formularioBusqueda" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Buscar Competición</label>
+          <input 
+            type="text" 
+            formControlName="busqueda" 
+            placeholder="Ej. Premier League, Primera División..." 
+            class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Filtrar por Región</label>
+          <select 
+            formControlName="regionSeleccionada" 
+            class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors appearance-none"
+          >
+            <option value="todas">Todas las regiones</option>
+            <option value="europa">Europa</option>
+            <option value="españa">España</option>
+            <option value="inglaterra">Inglaterra</option>
+            <option value="alemania">Alemania</option>
+          </select>
+        </div>
+      </form>
+    </section>
+
+    <!-- Indicador Visual de Carga -->
+    <div *ngIf="cargando" class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+    </div>
+
+    <!-- Grilla de Tarjetas de Competiciones -->
+    <div *ngIf="!cargando" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div 
+        *ngFor="let comp of competicionesFiltradas" 
+        class="group bg-slate-800/20 border border-slate-800 hover:border-slate-700 rounded-xl p-5 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+      >
+        <div>
+          <div class="flex items-start justify-between mb-4">
+            <span class="text-xs font-mono px-2 py-1 bg-slate-800 text-slate-300 rounded">
+              Código: {{ comp.codigo }}
+            </span>
+            <span class="text-xl">
+              {{ comp.region.bandera || '🌍' }}
+            </span>
+          </div>
+          <h3 class="font-bold text-lg text-slate-100 group-hover:text-emerald-400 transition-colors mb-1">
+            {{ comp.nombre }}
+          </h3>
+          <p class="text-xs text-slate-400 mb-4">Zona geográfica: {{ comp.region.nombre }}</p>
+        </div>
+
+        <div class="border-t border-slate-800/60 pt-4 mt-4 flex items-center justify-between text-xs text-slate-500">
+          <span>Temporadas: <strong>{{ comp.temporadasDisponibles }}</strong></span>
+          <span>Actualizado: {{ comp.ultimaActualizacion | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no hay coincidencias -->
+    <div *ngIf="!cargando && competicionesFiltradas.length === 0" class="text-center py-12 border border-dashed border-slate-800 rounded-xl">
+      <p class="text-slate-400 text-sm">No se encontraron ligas o competiciones con esos criterios de búsqueda.</p>
+    </div>
+  </main>
+</div>
