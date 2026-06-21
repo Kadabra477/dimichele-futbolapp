@@ -1,4 +1,3 @@
-//implementar formulario
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -10,7 +9,7 @@ import { debounceTime, startWith } from 'rxjs/operators';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './app.component.html',
+  templateUrl: './app.component.html', // <-- Asegurate de que diga esto y NO "template: `...`"
   styles: []
 })
 export class AppComponent implements OnInit {
