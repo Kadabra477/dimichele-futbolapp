@@ -11,7 +11,7 @@ import { debounceTime, startWith } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styles: []
 })
 export class AppComponent implements OnInit {
   formularioBusqueda: FormGroup;
