@@ -1,8 +1,5 @@
-export interface PartidoReal {
+export interface PartidoFormateado {
   id: number;
-  liga: string;
-  pais: string;
-  logo_liga: string;
   local: string;
   visitante: string;
   escudo_local: string;
@@ -10,9 +7,12 @@ export interface PartidoReal {
   goles_local: number | null;
   goles_visitante: number | null;
   estado: string;
-  detalles_goles?: string;
+  liga: string;
+  pais: string;
 }
 
-export interface RespuestaPublica {
-  partidos: PartidoReal[];
+export interface LigaAgrupada {
+  nombreLiga: string;
+  paisZona: string;
+  partidos: PartidoFormateado[];
 }

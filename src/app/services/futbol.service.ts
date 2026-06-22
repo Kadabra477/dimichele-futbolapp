@@ -1,19 +1,27 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { RespuestaPublica } from '../models/futbol.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FutbolService {
-  // Consumo directo de la API libre recomendada en el examen
-  private urlPublica = 'https://api.freepublicapis.com/football/matches-today';
+  private urlApi = 'https://v3.football.api-sports.io/fixtures';
+  
+  // 🔥 METER ACÁ TU KEY DEL DASHBOARD DE API-SPORTS:
+  private apiKey = '782aabf766ed92451f004c19beb3bdf0'; 
 
   constructor(private http: HttpClient) {}
 
-  obtenerPartidosDeHoy(): Observable<RespuestaPublica> {
-    // Petición GET directa y asíncrona sin restricciones de origen de navegador
-    return this.http.get<RespuestaPublica>(this.urlPublica);
+  obtenerPartidosDeHoy(): Observable<any> {
+    const headers = new HttpHeaders({
+      'x-rapidapi-host': 'v3.football.api-sports.io',
+      'x-rapidapi-key': this.apiKey
+    });
+
+    // Obtenemos de forma dinámica la fecha del día de hoy en formato YYYY-MM-DD
+    const hoy = new Date().toISOString().split('T')[0];
+
+    return this.http.get<any>(`${this.urlApi}?date=${hoy}`, { headers });
   }
 }
