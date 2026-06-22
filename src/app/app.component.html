@@ -1,146 +1,121 @@
-<div class="min-h-screen bg-slate-950 text-slate-100 font-sans">
-  <header class="border-b border-slate-800 bg-slate-900 sticky top-0 z-50 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="bg-emerald-600 text-white p-2 rounded font-bold tracking-wider text-sm shadow">PRO</div>
-        <h1 class="text-lg font-bold tracking-tight text-slate-200">
-          Fútbol Arena <span class="text-emerald-500 font-normal">Resultados</span>
-        </h1>
-      </div>
-      <div class="text-xs text-slate-400 font-mono bg-slate-800 px-2 py-1 rounded">
-        Angular v21
-      </div>
+<div class="min-h-screen bg-[#11321a] text-slate-100 font-sans antialiased">
+  
+  <header class="bg-[#0b1a10] border-b border-emerald-900/40 py-4 px-6 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-black tracking-tight text-white flex items-center gap-1">
+        PRO<span class="text-emerald-500">MIE</span>DOS
+      </h1>
+      <span class="text-xs font-mono text-emerald-600 bg-emerald-950/80 px-2 py-1 rounded border border-emerald-900/40">
+        UCH CHAMPAGNAT · PROG V
+      </span>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto px-4 py-6">
-    <section class="bg-slate-900 border border-slate-800 rounded-lg p-4 mb-6">
-      <form [formGroup]="formularioBusqueda" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="md:col-span-2">
-          <input 
-            type="text" 
-            formControlName="busqueda" 
-            placeholder="Buscar competencia (Ej: Liga Profesional, PL...)" 
-            class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors"
-          />
-        </div>
-        <div>
-          <select 
-            formControlName="paisSeleccionado" 
-            class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500"
-          >
-            <option value="todos">Todos los países</option>
-            <option value="Argentina">Argentina</option>
-            <option value="Inglaterra">Inglaterra</option>
-            <option value="España">España</option>
-            <option value="Europa">Europa (Copas)</option>
-          </select>
-        </div>
-        <div>
-          <select 
-            formControlName="tipoSeleccionado" 
-            class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500"
-          >
-            <option value="todos">Todos los formatos</option>
-            <option value="Liga">Ligas</option>
-            <option value="Copa">Copas</option>
-          </select>
-        </div>
-      </form>
-    </section>
+  <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+    
+    <aside class="lg:col-span-1 bg-[#0b1a10]/90 rounded border border-emerald-950 p-4 space-y-6">
+      <div>
+        <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-3 pb-1 border-b border-emerald-900/40">
+          DESTACADO
+        </h3>
+        <ul class="space-y-2 text-sm text-slate-300">
+          <li class="hover:text-white cursor-pointer py-1 transition-colors font-medium text-emerald-400">🏆 Mundial</li>
+          <li class="hover:text-white cursor-pointer py-1 transition-colors">Liga Profesional</li>
+          <li class="hover:text-white cursor-pointer py-1 transition-colors">Primera Nacional</li>
+          <li class="hover:text-white cursor-pointer py-1 transition-colors">Libertadores</li>
+          <li class="hover:text-white cursor-pointer py-1 transition-colors">Sudamericana</li>
+          <li class="hover:text-white cursor-pointer py-1 transition-colors">Copa Argentina</li>
+          <li class="hover:text-white cursor-pointer py-1 transition-colors">Champions</li>
+        </ul>
+      </div>
 
-    <div *ngIf="cargando" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-    </div>
+      <div>
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pb-1 border-b border-emerald-900/20">
+          PAÍSES
+        </h3>
+        <ul class="space-y-2 text-sm text-slate-400">
+          <li class="hover:text-slate-200 cursor-pointer">🇦🇷 Argentina</li>
+          <li class="hover:text-slate-200 cursor-pointer">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</li>
+          <li class="hover:text-slate-200 cursor-pointer">🇪🇸 España</li>
+          <li class="hover:text-slate-200 cursor-pointer">🇮🇹 Italia</li>
+        </ul>
+      </div>
+    </aside>
 
-    <div *ngIf="!cargando" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <main class="lg:col-span-3 space-y-4">
       
-      <div class="space-y-2 lg:col-span-1">
-        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 mb-3">Competiciones Disponibles</h2>
+      <div class="bg-[#0b1a10] rounded p-2 flex items-center justify-between border border-emerald-950 shadow">
+        <div class="flex gap-2">
+          <button 
+            (click)="cambiarVista('TODOS')"
+            [ngClass]="vistaActual === 'TODOS' ? 'bg-emerald-800 text-white font-bold' : 'text-slate-400 hover:text-slate-200'"
+            class="px-4 py-1.5 rounded text-xs uppercase tracking-wider transition-all"
+          >
+            TODOS
+          </button>
+          <button 
+            (click)="cambiarVista('VIVO')"
+            [ngClass]="vistaActual === 'VIVO' ? 'bg-emerald-800 text-white font-bold' : 'text-slate-400 hover:text-slate-200'"
+            class="px-4 py-1.5 rounded text-xs uppercase tracking-wider transition-all flex items-center gap-1.5"
+          >
+            VIVO <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> (0)
+          </button>
+        </div>
+        <span class="text-xs text-slate-400 italic hidden sm:inline">Resultados y tabla de posiciones de fútbol</span>
+      </div>
+
+      <div *ngFor="let comp of competencias" class="bg-[#0b1a10] rounded border border-emerald-950 overflow-hidden shadow-lg">
         
-        <div *ngIf="ligasFiltradas.length === 0" class="text-sm text-slate-500 bg-slate-900 border border-slate-800 rounded p-4 text-center">
-          No hay ligas que coincidan.
+        <div class="bg-gradient-to-r from-[#07130c] to-[#0b1a10] px-4 py-2.5 border-b border-emerald-950 flex justify-between items-center">
+          <h2 class="text-sm font-bold tracking-wide text-slate-200 flex items-center gap-2">
+            ⚽ {{ comp.nombre }}
+          </h2>
+          <span class="text-[10px] font-bold text-emerald-500 tracking-widest cursor-pointer hover:underline">
+            SECCIÓN DE {{ comp.nombre }} ❯
+          </span>
         </div>
 
-        <button 
-          *ngFor="let liga of ligasFiltradas"
-          (click)="seleccionarLiga(liga)"
-          [ngClass]="{
-            'border-emerald-600 bg-emerald-950/20 text-emerald-400': ligaSeleccionada?.id === liga.id,
-            'border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300': ligaSeleccionada?.id !== liga.id
-          }"
-          class="w-full text-left border rounded p-3 transition-all flex items-center justify-between group"
-        >
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono px-1.5 py-0.5 bg-slate-950 text-slate-400 rounded">
-              {{ liga.codigo }}
-            </span>
-            <div class="flex flex-col">
-              <span class="font-medium text-sm text-slate-200 group-hover:text-white transition-colors">{{ liga.nombre }}</span>
-              <span class="text-xs text-slate-500">{{ liga.pais }} · {{ liga.tipo }}</span>
-            </div>
+        <div class="divide-y divide-emerald-950/60">
+          <div *ngIf="comp.partidos.length === 0" class="p-4 text-xs text-slate-500 italic text-center">
+            No hay partidos programados para hoy en esta sección.
           </div>
-          <span class="text-slate-600 group-hover:text-slate-400 text-sm">▶</span>
-        </button>
+
+          <div *ngFor="let partido of comp.partidos" class="hover:bg-emerald-950/10 transition-colors p-3 text-sm grid grid-cols-12 items-center gap-2">
+            
+            <div class="col-span-2 text-center">
+              <span 
+                [ngClass]="partido.estado === 'Final' ? 'bg-slate-900 text-slate-400 border-slate-800' : 'bg-emerald-950 text-emerald-400 border-emerald-800'"
+                class="px-2 py-0.5 text-[11px] font-mono font-bold rounded border"
+              >
+                {{ partido.estado }}
+              </span>
+            </div>
+
+            <div class="col-span-10 flex flex-col justify-center space-y-1">
+              <div class="flex items-center justify-between w-full px-4">
+                <div class="w-5/12 text-right font-medium pr-2 text-slate-200">
+                  {{ partido.local }}
+                </div>
+                <div class="w-2/12 bg-slate-950 border border-emerald-900/40 rounded py-0.5 text-center font-mono font-black text-emerald-400 text-base shadow-inner">
+                  {{ partido.golesLocal !== null ? partido.golesLocal : '-' }} : {{ partido.golesVisitante !== null ? partido.golesVisitante : '-' }}
+                </div>
+                <div class="w-5/12 text-left font-medium pl-2 text-slate-200">
+                  {{ partido.visitante }}
+                </div>
+              </div>
+
+              <div class="w-full text-[11px] font-sans text-emerald-500/90 flex justify-between px-4">
+                <div class="w-5/12 text-right truncate italic">{{ partido.detallesLocal || '' }}</div>
+                <div class="w-2/12"></div>
+                <div class="w-5/12 text-left truncate italic">{{ partido.detallesVisitante || '' }}</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
-      <div class="lg:col-span-2">
-        <div *ngIf="ligaSeleccionada" class="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-xl">
-          <div class="bg-slate-850 p-4 border-b border-slate-800 flex items-center justify-between">
-            <div>
-              <h2 class="font-bold text-base text-slate-100 tracking-wide">{{ ligaSeleccionada.nombre }}</h2>
-              <p class="text-xs text-slate-400">Tabla de posiciones oficial · {{ ligaSeleccionada.pais }}</p>
-            </div>
-            <span class="text-xs font-bold uppercase tracking-widest px-2 py-1 bg-slate-800 text-emerald-400 rounded">
-              {{ ligaSeleccionada.tipo }}
-            </span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="bg-slate-950 text-xs uppercase text-slate-400 font-mono border-b border-slate-800">
-                <tr>
-                  <th class="py-3 px-4 text-center w-12">Pos</th>
-                  <th class="py-3 px-4">Club</th>
-                  <th class="py-3 px-3 text-center">PJ</th>
-                  <th class="py-3 px-3 text-center">PG</th>
-                  <th class="py-3 px-3 text-center">PE</th>
-                  <th class="py-3 px-3 text-center">PP</th>
-                  <th class="py-3 px-4 text-center font-bold text-slate-200 w-16">Pts</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-800/60">
-                <tr 
-                  *ngFor="let equipo of ligaSeleccionada.tabla" 
-                  class="hover:bg-slate-800/40 transition-colors"
-                  [ngClass]="{'bg-emerald-950/5': equipo.posicion <= 2}"
-                >
-                  <td class="py-3 px-4 text-center font-mono font-bold" [ngClass]="{'text-emerald-400': equipo.posicion <= 2}">
-                    {{ equipo.posicion }}
-                  </td>
-                  <td class="py-3 px-4 font-medium text-slate-200 flex items-center gap-2">
-                    <span class="text-xs opacity-70">{{ equipo.escudo }}</span>
-                    {{ equipo.nombre }}
-                  </td>
-                  <td class="py-3 px-3 text-center font-mono text-slate-400">{{ equipo.pj }}</td>
-                  <td class="py-3 px-3 text-center font-mono text-emerald-500/80">{{ equipo.pg }}</td>
-                  <td class="py-3 px-3 text-center font-mono text-slate-400">{{ equipo.pe }}</td>
-                  <td class="py-3 px-3 text-center font-mono text-rose-500/80">{{ equipo.pp }}</td>
-                  <td class="py-3 px-4 text-center font-mono font-bold text-base" [ngClass]="{'text-emerald-400': equipo.posicion <= 2, 'text-slate-100': equipo.posicion > 2}">
-                    {{ equipo.pts }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div *ngIf="!ligaSeleccionada" class="flex flex-col items-center justify-center py-20 border border-dashed border-slate-800 rounded-lg text-slate-500">
-          <span class="text-3xl mb-2">📊</span>
-          <p class="text-sm">Seleccioná una competición del panel izquierdo para desplegar la tabla.</p>
-        </div>
-      </div>
-
-    </div>
+    </main>
   </div>
 </div>

@@ -1,20 +1,17 @@
-export interface EquipoPosicion {
-  posicion: number;
-  nombre: string;
-  escudo: string;
-  pj: number;
-  pg: number;
-  pe: number;
-  pp: number;
-  pts: number;
+export interface Partido {
+  id: number;
+  local: string;
+  visitante: string;
+  golesLocal: number | null;
+  golesVisitante: number | null;
+  estado: 'Final' | 'Vivo' | string; // Ej: "22:00"
+  detallesLocal?: string;
+  detallesVisitante?: string;
 }
 
-export interface Competicion {
-  id: string;      // Cambiado a string para soportar 'arg_1', 'eng_1', etc.
+export interface CompetenciaDestacada {
+  id: string;
   nombre: string;
-  codigo: string;
-  pais: string;    // Agregado para el filtro de Promiedos
-  tipo: 'Liga' | 'Copa'; // Agregado para discriminar el formato
-  logo: string;
-  tabla: EquipoPosicion[]; // Agregado para renderizar las posiciones
+  categoria: 'DESTACADO' | 'ARGENTINA' | 'INTERNACIONAL' | 'INGLATERRA' | 'ESPAÑA' | 'ITALIA' | 'ALEMANIA';
+  partidos: Partido[];
 }
