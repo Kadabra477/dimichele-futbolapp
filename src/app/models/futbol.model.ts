@@ -1,17 +1,47 @@
-export interface Partido {
-  id: number;
-  local: string;
-  visitante: string;
-  golesLocal: number | null;
-  golesVisitante: number | null;
-  estado: 'Final' | 'Vivo' | string; // Ej: "22:00"
-  detallesLocal?: string;
-  detallesVisitante?: string;
+export interface Area {
+  name: string;
+  flag: string | null;
 }
 
-export interface CompetenciaDestacada {
-  id: string;
-  nombre: string;
-  categoria: 'DESTACADO' | 'ARGENTINA' | 'INTERNACIONAL' | 'INGLATERRA' | 'ESPAÑA' | 'ITALIA' | 'ALEMANIA';
-  partidos: Partido[];
+export interface Competition {
+  id: number;
+  name: string;
+  code: string;
+  emblem: string | null;
+  area: Area;
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  shortName: string;
+  tla: string;
+  crest: string;
+}
+
+export interface ScoreDetails {
+  home: number | null;
+  away: number | null;
+}
+
+export interface Score {
+  winner: string | null;
+  duration: string;
+  fullTime: ScoreDetails;
+}
+
+export interface Match {
+  id: number;
+  competition: Competition;
+  utcDate: string;
+  status: 'FINISHED' | 'LIVE' | 'TIMED' | 'IN_PLAY' | string;
+  homeTeam: Team;
+  awayTeam: Team;
+  score: Score;
+}
+
+export interface RespuestaPartidos {
+  count: number;
+  filters: any;
+  matches: Match[];
 }
