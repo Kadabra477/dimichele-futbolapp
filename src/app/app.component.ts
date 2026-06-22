@@ -2,8 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FutbolService } from './services/futbol.service';
-import { Match } from './models/futbol.model';
+import { PartidoReal } from './models/futbol.model';
 import { debounceTime, startWith } from 'rxjs/operators';
+
+interface LigaAgrupada {
+  nombre: string;
+  pais: string;
+  logo: string;
+  partidos: PartidoReal[];
+}
 
 @Component({
   selector: 'app-root',
@@ -13,101 +20,101 @@ import { debounceTime, startWith } from 'rxjs/operators';
   styles: []
 })
 export class AppComponent implements OnInit {
-  formularioFiltro: FormGroup;
-  todosLosPartidos: Match[] = [];
-  partidosFiltrados: Match[] = [];
-  ligasAgrupadas: { [key: string]: { nombre: string; area: string; logo: string; partidos: Match[] } } = {};
+  formularioBusqueda: FormGroup;
+  listaPartidosGlobal: PartidoReal[] = [];
+  partidosFiltrados: PartidoReal[] = [];
+  
+  // Diccionario para armar las cajas estilo Promiedos
+  bloquesLigas: { [key: string]: LigaAgrupada } = {};
   clavesLigas: string[] = [];
   
-  vistaActual: 'TODOS' | 'VIVO' = 'TODOS';
+  categoriaSeleccionada: string = 'TODOS';
+  estadoSeleccionado: 'TODOS' | 'VIVO' = 'TODOS';
   cargando = true;
-  errorApi = false;
 
   constructor(private fb: FormBuilder, private futbolService: FutbolService) {
-    this.formularioFiltro = this.fb.group({
-      busquedaClub: [''],
-      paisSeleccionado: ['todos']
+    this.formularioBusqueda = this.fb.group({
+      filtroClub: ['']
     });
   }
 
   ngOnInit(): void {
-    this.futbolService.obtenerPartidosDelDia().subscribe({
+    this.futbolService.obtenerPartidosDeHoy().subscribe({
       next: (data) => {
-        this.todosLosPartidos = data.matches || [];
-        this.partidosFiltrados = this.todosLosPartidos;
-        this.agruparPartidosPorLiga();
+        // Leemos la data real que viene del servidor externo de hoy
+        this.listaPartidosGlobal = data.partidos || [];
+        this.partidosFiltrados = this.listaPartidosGlobal;
+        
+        this.procesarYAgruparBloques();
         this.cargando = false;
-        this.escucharFiltros();
+        this.inicializarEscuchaReactiva();
       },
       error: (err) => {
-        console.error('Error al consumir la API real:', err);
+        console.error('Error al mapear la API pública de fútbol:', err);
         this.cargando = false;
-        this.errorApi = true;
       }
     });
   }
 
-  cambiarVista(tipo: 'TODOS' | 'VIVO') {
-    this.vistaActual = tipo;
-    this.filtrarYAgrupar();
-  }
-
-  escucharFiltros() {
-    this.formularioFiltro.valueChanges
-      .pipe(debounceTime(200))
+  inicializarEscuchaReactiva(): void {
+    this.formularioBusqueda.valueChanges
+      .pipe(
+        startWith({ filtroClub: '' }),
+        debounceTime(150)
+      )
       .subscribe(() => {
-        this.filtrarYAgrupar();
+        this.filtrarResultados();
       });
   }
 
-  filtrarYAgrupar() {
-    const { busquedaClub, paisSeleccionado } = this.formularioFiltro.value;
-
-    this.partidosFiltrados = this.todosLosPartidos.filter(partido => {
-      // Filtro de Todos / En Vivo
-      const cumpleEstado = this.vistaActual === 'TODOS' || 
-                           partido.status === 'IN_PLAY' || 
-                           partido.status === 'LIVE';
-
-      // Filtro de búsqueda por club
-      const cumpleClub = partido.homeTeam.name.toLowerCase().includes(busquedaClub.toLowerCase()) ||
-                          partido.awayTeam.name.toLowerCase().includes(busquedaClub.toLowerCase());
-
-      // Filtro por continente/país de la competición
-      const cumplePais = paisSeleccionado === 'todos' || 
-                         partido.competition.area.name.toLowerCase() === paisSeleccionado.toLowerCase();
-
-      return cumpleEstado && cumpleClub && cumplePais;
-    });
-
-    this.agruparPartidosPorLiga();
+  cambiarPaisFiltro(pais: string): void {
+    this.categoriaSeleccionada = pais;
+    this.filtrarResultados();
   }
 
-  agruparPartidosPorLiga() {
-    const agrupado: { [key: string]: { nombre: string; area: string; logo: string; partidos: Match[] } } = {};
+  cambiarEstadoFiltro(estado: 'TODOS' | 'VIVO'): void {
+    this.estadoSeleccionado = estado;
+    this.filtrarResultados();
+  }
 
-    this.partidosFiltrados.forEach(partido => {
-      const ligaId = partido.competition.id.toString();
-      if (!agrupado[ligaId]) {
-        agrupado[ligaId] = {
-          nombre: partido.competition.name,
-          area: partido.competition.area.name,
-          logo: partido.competition.emblem || '',
+  filtrarResultados(): void {
+    const { filtroClub } = this.formularioBusqueda.value;
+
+    this.partidosFiltrados = this.listaPartidosGlobal.filter(p => {
+      const coincideClub = p.local.toLowerCase().includes(filtroClub.toLowerCase()) || 
+                           p.visitante.toLowerCase().includes(filtroClub.toLowerCase());
+      
+      const coincidePais = this.categoriaSeleccionada === 'TODOS' || 
+                           p.pais.toLowerCase() === this.categoriaSeleccionada.toLowerCase();
+      
+      const coincideEstado = this.estadoSeleccionado === 'TODOS' || 
+                             p.estado.toLowerCase() === 'vivo';
+
+      return coincideClub && coincidePais && coincideEstado;
+    });
+
+    this.procesarYAgruparBloques();
+  }
+
+  procesarYAgruparBloques(): void {
+    const mapas: { [key: string]: LigaAgrupada } = {};
+
+    this.partidosFiltrados.forEach(p => {
+      // Agrupamos bajo una clave única combinando país y liga para precisión absoluta
+      const idLiga = `${p.pais}_${p.liga}`.replace(/\s+/g, '_').toLowerCase();
+      
+      if (!mapas[idLiga]) {
+        mapas[idLiga] = {
+          nombre: p.liga,
+          pais: p.pais,
+          logo: p.logo_liga || '',
           partidos: []
         };
       }
-      agrupado[ligaId].partidos.push(partido);
+      mapas[idLiga].partidos.push(p);
     });
 
-    this.ligasAgrupadas = agrupado;
-    this.clavesLigas = Object.keys(agrupado);
-  }
-
-  transformarEstado(status: string, fechaUtc: string): string {
-    if (status === 'FINISHED') return 'Final';
-    if (status === 'IN_PLAY' || status === 'LIVE') return 'Vivo';
-    // Si no empezó, extrae la hora local del partido
-    const fecha = new Date(fechaUtc);
-    return fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    this.bloquesLigas = mapas;
+    this.clavesLigas = Object.keys(mapas);
   }
 }

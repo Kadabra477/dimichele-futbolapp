@@ -1,47 +1,18 @@
-export interface Area {
-  name: string;
-  flag: string | null;
-}
-
-export interface Competition {
+export interface PartidoReal {
   id: number;
-  name: string;
-  code: string;
-  emblem: string | null;
-  area: Area;
+  liga: string;
+  pais: string;
+  logo_liga: string;
+  local: string;
+  visitante: string;
+  escudo_local: string;
+  escudo_visitante: string;
+  goles_local: number | null;
+  goles_visitante: number | null;
+  estado: string;
+  detalles_goles?: string;
 }
 
-export interface Team {
-  id: number;
-  name: string;
-  shortName: string;
-  tla: string;
-  crest: string;
-}
-
-export interface ScoreDetails {
-  home: number | null;
-  away: number | null;
-}
-
-export interface Score {
-  winner: string | null;
-  duration: string;
-  fullTime: ScoreDetails;
-}
-
-export interface Match {
-  id: number;
-  competition: Competition;
-  utcDate: string;
-  status: 'FINISHED' | 'LIVE' | 'TIMED' | 'IN_PLAY' | string;
-  homeTeam: Team;
-  awayTeam: Team;
-  score: Score;
-}
-
-export interface RespuestaPartidos {
-  count: number;
-  filters: any;
-  matches: Match[];
+export interface RespuestaPublica {
+  partidos: PartidoReal[];
 }
