@@ -15,13 +15,64 @@
     
     <aside class="lg:col-span-1 bg-[#0b1a10]/90 rounded border border-emerald-950 p-4 space-y-2 h-fit">
       <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-wider pb-2 mb-2 border-b border-emerald-900/40">
-        Filtrar por Región
+        FILTRAR POR REGIÓN
       </h3>
-      <button (click)="filtrarPorPais('TODOS')" [class.text-emerald-400]="paisSeleccionado === 'TODOS'" class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium">Mostrar Todo</button>
-      <button (click)="filtrarPorPais('Argentina')" [class.text-emerald-400]="paisSeleccionado === 'Argentina'" class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium">Argentina</button>
-      <button (click)="filtrarPorPais('England')" [class.text-emerald-400]="paisSeleccionado === 'England'" class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium">Inglaterra</button>
-      <button (click)="filtrarPorPais('Spain')" [class.text-emerald-400]="paisSeleccionado === 'Spain'" class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium">España</button>
-      <button (click)="filtrarPorPais('Sudamerica')" [class.text-emerald-400]="paisSeleccionado === 'Sudamerica'" class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium">Sudamérica</button>
+      
+      <button 
+        (click)="cambiarFiltroRegion('TODOS')" 
+        [class.text-emerald-400]="continenteSeleccionado === 'TODOS'" 
+        class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium"
+      >
+        ⚽ Mostrar Todo
+      </button>
+
+      <button 
+        (click)="cambiarFiltroRegion('MUNDIAL')" 
+        [class.text-emerald-400]="continenteSeleccionado === 'MUNDIAL'" 
+        class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium"
+      >
+        ⭐ Destacado / Mundial
+      </button>
+
+      <button 
+        (click)="cambiarFiltroRegion('AMERICA')" 
+        [class.text-emerald-400]="continenteSeleccionado === 'AMERICA'" 
+        class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium"
+      >
+        América
+      </button>
+
+      <button 
+        (click)="cambiarFiltroRegion('EUROPA')" 
+        [class.text-emerald-400]="continenteSeleccionado === 'EUROPA'" 
+        class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium"
+      >
+        Europa
+      </button>
+
+      <button 
+        (click)="cambiarFiltroRegion('AFRICA')" 
+        [class.text-emerald-400]="continenteSeleccionado === 'AFRICA'" 
+        class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium"
+      >
+        África
+      </button>
+
+      <button 
+        (click)="cambiarFiltroRegion('OCEANIA')" 
+        [class.text-emerald-400]="continenteSeleccionado === 'OCEANIA'" 
+        class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium"
+      >
+        Oceanía
+      </button>
+
+      <button 
+        (click)="cambiarFiltroRegion('ASIA')" 
+        [class.text-emerald-400]="continenteSeleccionado === 'ASIA'" 
+        class="w-full text-left py-1.5 px-2 rounded text-sm text-slate-300 hover:bg-emerald-950/40 block transition-colors font-medium"
+      >
+        Asia
+      </button>
     </aside>
 
     <main class="lg:col-span-3 space-y-4">
@@ -38,7 +89,7 @@
 
       <div *ngIf="!cargando">
         <div *ngIf="clavesLigas.length === 0" class="p-8 bg-[#0b1a10] border border-emerald-950 rounded text-center text-xs text-slate-400">
-          No hay encuentros disponibles disputándose para esta categoría hoy.
+          No hay encuentros disponibles programados para esta categoría hoy.
         </div>
 
         <div *ngFor="let clave of clavesLigas" class="bg-[#0b1a10] rounded border border-emerald-950 overflow-hidden shadow-lg mb-4">
@@ -60,7 +111,7 @@
               <div class="col-span-10 flex items-center justify-between px-4">
                 <div class="w-5/12 text-right text-slate-100 pr-2 flex items-center justify-end gap-2">
                   <span class="font-medium">{{ partido.local }}</span>
-                  <img *ngIf="partido.escudo_local" [src]="partido.escudo_local" class="w-4 h-4 object-contain" alt="crest" />
+                  <img *ngIf="partido.escudo_local" [src]="partido.escudo_local" class="w-4 h-4 object-contain" alt="" />
                 </div>
                 
                 <div class="w-2/12 text-center font-mono font-black text-emerald-400 bg-slate-950 border border-emerald-900/30 py-0.5 rounded shadow-inner tracking-wider">
@@ -68,7 +119,7 @@
                 </div>
                 
                 <div class="w-5/12 text-left text-slate-100 pl-2 flex items-center justify-start gap-2">
-                  <img *ngIf="partido.escudo_visitante" [src]="partido.escudo_visitante" class="w-4 h-4 object-contain" alt="crest" />
+                  <img *ngIf="partido.escudo_visitante" [src]="partido.escudo_visitante" class="w-4 h-4 object-contain" alt="" />
                   <span class="font-medium">{{ partido.visitante }}</span>
                 </div>
               </div>

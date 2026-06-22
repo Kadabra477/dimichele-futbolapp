@@ -9,6 +9,7 @@ export interface PartidoFormateado {
   estado: string;
   liga: string;
   pais: string;
+  tipo: 'Copa' | 'Liga' | 'Mundial';
 }
 
 export interface LigaAgrupada {
