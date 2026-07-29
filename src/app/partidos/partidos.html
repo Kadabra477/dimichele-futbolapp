@@ -1,0 +1,189 @@
+<div class="flex flex-col md:flex-row min-h-[calc(100vh-68px)] bg-[#0f172a] text-white">
+   
+  <!-- PANEL LATERAL DE FILTROS -->
+  <aside class="w-full md:w-64 bg-[#111827] p-6 border-r border-slate-700 shrink-0">
+    <h3 class="text-slate-400 font-semibold mb-4 uppercase tracking-wider text-xs">Filtros de busqueda</h3>
+    
+    <form [formGroup]="formularioFiltro" class="mb-6">
+      <input type="text" formControlName="buscarClub" placeholder="Buscar equipo..." 
+             class="w-full bg-[#1f2937] text-white p-2 rounded border border-slate-600 focus:outline-none focus:border-slate-400">
+    </form>
+
+    <ul class="space-y-2 text-slate-300 font-medium text-sm">
+      <!-- APARTADO FAVORITOS EN EL PANEL LATERAL -->
+      <li>
+        <button (click)="verFavoritosGuardados()" 
+                [class.text-white]="continenteSeleccionado === 'FAVORITOS'"
+                [class.bg-yellow-600]="continenteSeleccionado === 'FAVORITOS'"
+                class="hover:text-white hover:bg-yellow-700/50 px-3 py-2 rounded transition-colors w-full text-left flex items-center gap-2 border border-yellow-500/30 text-yellow-400 font-semibold">
+          ⭐ Mis Favoritos
+        </button>
+      </li>
+
+      <hr class="border-slate-700 my-2">
+
+      <li>
+        <button (click)="cambiarFiltroRegion('TODOS')" 
+                [class.text-white]="continenteSeleccionado === 'TODOS'"
+                [class.bg-[#1f2937]]="continenteSeleccionado === 'TODOS'"
+                class="hover:text-white hover:bg-[#1f2937] px-3 py-2 rounded transition-colors w-full text-left">
+          Todos los partidos
+        </button>
+      </li>
+      <li>
+        <button (click)="cambiarFiltroRegion('MUNDIAL')" 
+                [class.text-white]="continenteSeleccionado === 'MUNDIAL'"
+                [class.bg-[#1f2937]]="continenteSeleccionado === 'MUNDIAL'"
+                class="hover:text-white hover:bg-[#1f2937] px-3 py-2 rounded transition-colors w-full text-left">
+          Internacional / Copas
+        </button>
+      </li>
+      <li>
+        <button (click)="cambiarFiltroRegion('AMERICA')" 
+                [class.text-white]="continenteSeleccionado === 'AMERICA'"
+                [class.bg-[#1f2937]]="continenteSeleccionado === 'AMERICA'"
+                class="hover:text-white hover:bg-[#1f2937] px-3 py-2 rounded transition-colors w-full text-left">
+          America
+        </button>
+      </li>
+      <li>
+        <button (click)="cambiarFiltroRegion('EUROPA')" 
+                [class.text-white]="continenteSeleccionado === 'EUROPA'"
+                [class.bg-[#1f2937]]="continenteSeleccionado === 'EUROPA'"
+                class="hover:text-white hover:bg-[#1f2937] px-3 py-2 rounded transition-colors w-full text-left">
+          Europa
+        </button>
+      </li>
+      <li>
+        <button (click)="cambiarFiltroRegion('AFRICA')" 
+                [class.text-white]="continenteSeleccionado === 'AFRICA'"
+                [class.bg-[#1f2937]]="continenteSeleccionado === 'AFRICA'"
+                class="hover:text-white hover:bg-[#1f2937] px-3 py-2 rounded transition-colors w-full text-left">
+          Africa
+        </button>
+      </li>
+      <li>
+        <button (click)="cambiarFiltroRegion('OCEANIA')" 
+                [class.text-white]="continenteSeleccionado === 'OCEANIA'"
+                [class.bg-[#1f2937]]="continenteSeleccionado === 'OCEANIA'"
+                class="hover:text-white hover:bg-[#1f2937] px-3 py-2 rounded transition-colors w-full text-left">
+          Oceania
+        </button>
+      </li>
+      <li>
+        <button (click)="cambiarFiltroRegion('ASIA')" 
+                [class.text-white]="continenteSeleccionado === 'ASIA'"
+                [class.bg-[#1f2937]]="continenteSeleccionado === 'ASIA'"
+                class="hover:text-white hover:bg-[#1f2937] px-3 py-2 rounded transition-colors w-full text-left">
+          Asia
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <section class="flex-1 p-4 md:p-6 overflow-y-auto">
+    
+    <!-- BARRA DE FILTROS RÁPIDOS POR ESTADO -->
+    <div class="max-w-5xl mx-auto mb-6 flex flex-wrap gap-2 items-center justify-between bg-[#111827] p-3 rounded-lg border border-slate-800">
+      <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider ml-1">Filtrar estado:</span>
+      <div class="flex flex-wrap gap-2">
+        <button (click)="cambiarFiltroEstado('TODOS')" 
+                [class.bg-emerald-600]="estadoSeleccionado === 'TODOS'"
+                [class.bg-[#1f2937]]="estadoSeleccionado !== 'TODOS'"
+                class="text-xs px-3 py-1.5 rounded font-medium transition-colors border border-slate-700">
+          Todos
+        </button>
+        <button (click)="cambiarFiltroEstado('EN_VIVO')" 
+                [class.bg-emerald-600]="estadoSeleccionado === 'EN_VIVO'"
+                [class.bg-[#1f2937]]="estadoSeleccionado !== 'EN_VIVO'"
+                class="text-xs px-3 py-1.5 rounded font-medium transition-colors border border-slate-700 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> En Vivo
+        </button>
+        <button (click)="cambiarFiltroEstado('FINALIZADOS')" 
+                [class.bg-emerald-600]="estadoSeleccionado === 'FINALIZADOS'"
+                [class.bg-[#1f2937]]="estadoSeleccionado !== 'FINALIZADOS'"
+                class="text-xs px-3 py-1.5 rounded font-medium transition-colors border border-slate-700">
+          Finalizados
+        </button>
+        <button (click)="cambiarFiltroEstado('PROXIMOS')" 
+                [class.bg-emerald-600]="estadoSeleccionado === 'PROXIMOS'"
+                [class.bg-[#1f2937]]="estadoSeleccionado !== 'PROXIMOS'"
+                class="text-xs px-3 py-1.5 rounded font-medium transition-colors border border-slate-700">
+          Próximos
+        </button>
+      </div>
+    </div>
+
+    @if (cargando) {
+      <div class="flex justify-center items-center h-64">
+        <span class="text-sm text-slate-400 animate-pulse font-medium">Actualizando datos en tiempo real...</span>
+      </div>
+    } @else {
+      <div class="max-w-5xl mx-auto space-y-6">
+        @for (clave of clavesLigas; track clave) {
+          <div class="bg-[#111827] rounded-lg shadow-lg border border-slate-800 overflow-hidden">
+            
+            <!-- CABECERA DE LA LIGA -->
+            <div class="bg-[#1f2937] text-slate-200 px-4 py-2.5 font-semibold text-xs tracking-wider uppercase flex justify-between items-center border-b border-slate-700">
+              <span class="flex items-center gap-2">
+                @if (esLigaFavorita(bloquesLigas[clave].nombreLiga)) {
+                  <span class="text-yellow-400 text-sm" title="¡Liga favorita!">⭐</span>
+                }
+                {{ bloquesLigas[clave].nombreLiga }}
+              </span>
+              <span class="text-slate-400 font-normal">{{ bloquesLigas[clave].paisZona }}</span>
+            </div>
+
+            <div class="divide-y divide-slate-800">
+              @for (partido of bloquesLigas[clave].partidos; track partido.id) {
+                <div class="p-3.5 hover:bg-[#1a2234] transition-colors text-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                  
+                  <!-- EQUIPO LOCAL -->
+                  <div class="flex items-center justify-end flex-1 gap-3 w-full sm:w-auto">
+                    @if (esEquipoFavorito(partido.local)) {
+                      <span class="text-yellow-400 font-bold" title="¡Equipo favorito!">★</span>
+                    }
+                    <span class="font-normal truncate text-right">{{ partido.local }}</span>
+                    <img [src]="partido.escudo_local" alt="" class="w-5 h-5 object-contain">
+                  </div>
+
+                  <!-- ESTADO / GOLES -->
+                  <div class="flex flex-col items-center justify-center w-24 mx-2 shrink-0">
+                    @if (partido.estado === 'Prox' || partido.estado === 'Hoy') {
+                      <span class="text-slate-500 text-xs font-medium">VS</span>
+                    } @else {
+                      <span class="font-semibold text-slate-100 text-base">
+                        {{ partido.goles_local ?? 0 }} - {{ partido.goles_visitante ?? 0 }}
+                      </span>
+                      <span class="text-[10px] text-emerald-400 font-medium uppercase tracking-wider">{{ partido.estado }}</span>
+                    }
+                  </div>
+
+                  <!-- EQUIPO VISITANTE -->
+                  <div class="flex items-center justify-start flex-1 gap-3 w-full sm:w-auto">
+                    <img [src]="partido.escudo_visitante" alt="" class="w-5 h-5 object-contain">
+                    <span class="font-normal truncate text-left">{{ partido.visitante }}</span>
+                    @if (esEquipoFavorito(partido.visitante)) {
+                      <span class="text-yellow-400 font-bold" title="¡Equipo favorito!">★</span>
+                    }
+                  </div>
+
+                  <!-- BOTÓN MODAL DE COMENTARIOS -->
+                  <div class="shrink-0 mt-2 sm:mt-0">
+                    <app-comentarios [partidoId]="partido.id"></app-comentarios>
+                  </div>
+                  
+                </div>
+              }
+            </div>
+          </div>
+        } @empty {
+          <div class="text-center text-slate-500 mt-12 bg-[#111827] p-8 rounded-lg border border-slate-800 text-sm">
+            No se registran encuentros activos para los filtros seleccionados.
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>

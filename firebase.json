@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/futbol-arena-hub/browser",
+    "public": "dist/dimichele-futbolapp/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
