@@ -3,7 +3,7 @@ import { FavoritosService, Favorito } from '../services/favoritos.service';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AsyncPipe, CommonModule } from '@angular/common';
-import jsPDF from 'jspdf'; // <--- Importamos la librería para generar PDFs
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-favoritos',
@@ -15,7 +15,7 @@ import jsPDF from 'jspdf'; // <--- Importamos la librería para generar PDFs
 export class FavoritosComponent implements OnInit {
   private favoritosService = inject(FavoritosService);
   favoritos$!: Observable<Favorito[]>;
-  private listaFavoritosActuales: Favorito[] = []; // Copia en memoria para exportar
+  private listaFavoritosActuales: Favorito[] = []; 
   
   nuevoNombre = ''; 
   nuevoTipo = 'Equipo'; 
@@ -26,6 +26,11 @@ export class FavoritosComponent implements OnInit {
     this.favoritos$.subscribe(favs => {
       this.listaFavoritosActuales = favs;
     });
+  }
+
+  // Getter para saber si hay elementos y controlar el estado del botón PDF
+  get tieneFavoritos(): boolean {
+    return this.listaFavoritosActuales.length > 0;
   }
 
   guardar() {
@@ -52,8 +57,8 @@ export class FavoritosComponent implements OnInit {
     } 
   }
 
-  // Funcionalidad extra: Exportación de datos a PDF (jsPDF)
   exportarPDF() {
+    if (!this.tieneFavoritos) return; // Evita exportar si está vacío
     const doc = new jsPDF();
 
     doc.setFont("helvetica", "bold");
@@ -71,34 +76,28 @@ export class FavoritosComponent implements OnInit {
 
     let posY = 45;
 
-    if (this.listaFavoritosActuales.length === 0) {
-      doc.setFont("helvetica", "italic");
-      doc.setFontSize(11);
-      doc.text("No se registran elementos favoritos guardados en el sistema.", 14, posY);
-    } else {
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.setTextColor(30, 41, 59);
-      doc.text("Ítem / Nombre", 14, posY);
-      doc.text("Tipo de Registro", 120, posY);
-      
-      posY += 6;
-      doc.setDrawColor(226, 232, 240);
-      doc.line(14, posY, 196, posY);
-      posY += 8;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(30, 41, 59);
+    doc.text("Ítem / Nombre", 14, posY);
+    doc.text("Tipo de Registro", 120, posY);
+    
+    posY += 6;
+    doc.setDrawColor(226, 232, 240);
+    doc.line(14, posY, 196, posY);
+    posY += 8;
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      this.listaFavoritosActuales.forEach((fav, index) => {
-        if (posY > 280) { 
-          doc.addPage();
-          posY = 20;
-        }
-        doc.text(`${index + 1}. ${fav.nombre}`, 14, posY);
-        doc.text(fav.tipo.toUpperCase(), 120, posY);
-        posY += 10;
-      });
-    }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    this.listaFavoritosActuales.forEach((fav, index) => {
+      if (posY > 280) { 
+        doc.addPage();
+        posY = 20;
+      }
+      doc.text(`${index + 1}. ${fav.nombre}`, 14, posY);
+      doc.text(fav.tipo.toUpperCase(), 120, posY);
+      posY += 10;
+    });
 
     doc.save("mis-favoritos-futbolapp.pdf");
   }

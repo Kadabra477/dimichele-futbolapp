@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, collectionData, doc, addDoc, deleteDoc, updateDoc } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Firestore, collection, collectionData, doc, addDoc, deleteDoc, updateDoc, query, where } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
+import { Observable, of } from 'rxjs';
 
 export interface Favorito {
   id?: string;
   nombre: string;
   tipo: string; // 'Equipo' o 'Liga'
+  userId?: string;
 }
 
 @Injectable({
@@ -13,14 +15,26 @@ export interface Favorito {
 })
 export class FavoritosService {
   private firestore = inject(Firestore);
-  private favoritosCollection = collection(this.firestore, 'favoritos');
+  private auth = inject(Auth);
 
   getFavoritos(): Observable<Favorito[]> {
-    return collectionData(this.favoritosCollection, { idField: 'id' }) as Observable<Favorito[]>;
+    const user = this.auth.currentUser;
+    if (!user) {
+      return of([]); // Si no hay sesión, retorna vacío
+    }
+    const favoritosCollection = collection(this.firestore, 'favoritos');
+    // Filtramos para que cada usuario vea únicamente sus propios favoritos
+    const q = query(favoritosCollection, where('userId', '==', user.uid));
+    return collectionData(q, { idField: 'id' }) as Observable<Favorito[]>;
   }
 
   addFavorito(favorito: Favorito) {
-    return addDoc(this.favoritosCollection, favorito);
+    const user = this.auth.currentUser;
+    const favoritosCollection = collection(this.firestore, 'favoritos');
+    return addDoc(favoritosCollection, {
+      ...favorito,
+      userId: user ? user.uid : 'anonimo'
+    });
   }
 
   updateFavorito(id: string, data: any) {

@@ -1,9 +1,15 @@
 <div class="max-w-4xl mx-auto p-6 bg-slate-800 rounded-lg shadow-lg mt-8 text-white">
   
-  <!-- CABECERA CON TÍTULO Y BOTÓN DE EXPORTACIÓN A PDF -->
+  <!-- CABECERA CON TÍTULO Y BOTÓN DE EXPORTACIÓN A PDF CONDICIONAL -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
     <h2 class="text-3xl font-bold text-green-400">Mis Favoritos (CRUD Firestore)</h2>
-    <button (click)="exportarPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-1.5 shadow">
+    
+    <button (click)="exportarPDF()" 
+            [disabled]="!tieneFavoritos"
+            [class.opacity-50]="!tieneFavoritos"
+            [class.cursor-not-allowed]="!tieneFavoritos"
+            [class.hover:bg-emerald-500]="tieneFavoritos"
+            class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-1.5 shadow">
       📄 Exportar a PDF
     </button>
   </div>
