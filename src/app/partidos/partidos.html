@@ -10,17 +10,22 @@
     </form>
 
     <ul class="space-y-2 text-slate-300 font-medium text-sm">
-      <!-- APARTADO FAVORITOS EN EL PANEL LATERAL -->
+      <!-- APARTADO FAVORITOS EN EL PANEL LATERAL (Bloqueado si no hay sesión) -->
       <li>
-        <button (click)="verFavoritosGuardados()" 
+        <button (click)="usuarioLogueado ? verFavoritosGuardados() : null" 
+                [disabled]="!usuarioLogueado"
                 [class.text-white]="continenteSeleccionado === 'FAVORITOS'"
                 [class.bg-yellow-600]="continenteSeleccionado === 'FAVORITOS'"
+                [class.opacity-40]="!usuarioLogueado"
+                [class.cursor-not-allowed]="!usuarioLogueado"
+                [class.pointer-events-none]="!usuarioLogueado"
                 class="hover:text-white hover:bg-yellow-700/50 px-3 py-2 rounded transition-colors w-full text-left flex items-center gap-2 border border-yellow-500/30 text-yellow-400 font-semibold">
           ⭐ Mis Favoritos
         </button>
       </li>
 
       <hr class="border-slate-700 my-2">
+      <!-- Resto de los botones de región... -->
 
       <li>
         <button (click)="cambiarFiltroRegion('TODOS')" 

@@ -1,4 +1,4 @@
-import { Component, Input, inject, OnInit } from '@angular/core';
+import { Component, Input, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComentariosService, Comentario } from '../services/comentarios.service';
@@ -81,6 +81,7 @@ import { map } from 'rxjs';
 export class ComentariosComponent implements OnInit {
   @Input() partidoId!: number | string;
   private comentariosService = inject(ComentariosService);
+  private cdr = inject(ChangeDetectorRef); // Inyección para forzar la actualización de la vista
 
   comentariosPartido: Comentario[] = [];
   modalAbierto = false;
@@ -96,6 +97,7 @@ export class ComentariosComponent implements OnInit {
       map(lista => lista.filter(c => String(c.partidoId) === String(this.partidoId)))
     ).subscribe(res => {
       this.comentariosPartido = res;
+      this.cdr.detectChanges(); // Refresca cambios de datos en tiempo real
     });
   }
 
@@ -115,17 +117,18 @@ export class ComentariosComponent implements OnInit {
     this.mensajeError = '';
     const nombreClean = this.nuevoUsuario.trim().toLowerCase();
 
-    // Validar si ya existe una reseña con este mismo nombre para este partido
     const yaComento = this.comentariosPartido.some(
       c => c.usuario.toLowerCase().trim() === nombreClean
     );
 
     if (yaComento) {
       this.mensajeError = 'Ya has enviado una reseña para este partido. No se permite más de una por persona.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.cargandoEnvio = true;
+    this.cdr.detectChanges(); // Muestra "Enviando..." instantáneamente
 
     const nuevo: Comentario = {
       partidoId: this.partidoId,
@@ -139,11 +142,13 @@ export class ComentariosComponent implements OnInit {
       .then(() => {
         this.nuevoTexto = '';
         this.cargandoEnvio = false;
+        this.cdr.detectChanges(); // Quita el estado de carga al terminar
       })
       .catch(err => {
         console.error('Error al guardar comentario:', err);
         this.cargandoEnvio = false;
         this.mensajeError = 'Ocurrió un error al enviar el comentario. Inténtalo de nuevo.';
+        this.cdr.detectChanges(); // Muestra el error de inmediato en pantalla
       });
   }
 }
