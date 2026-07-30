@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, doc, addDoc, deleteDoc, updateDoc, query, where } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
+import { Auth, user } from '@angular/fire/auth';
 import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 export interface Favorito {
   id?: string;
@@ -16,24 +17,30 @@ export interface Favorito {
 export class FavoritosService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  
+  // Observable reactivo que escucha el estado de la sesión en tiempo real
+  private user$ = user(this.auth);
 
   getFavoritos(): Observable<Favorito[]> {
-    const user = this.auth.currentUser;
-    if (!user) {
-      return of([]); // Si no hay sesión, retorna vacío
-    }
-    const favoritosCollection = collection(this.firestore, 'favoritos');
-    // Filtramos para que cada usuario vea únicamente sus propios favoritos
-    const q = query(favoritosCollection, where('userId', '==', user.uid));
-    return collectionData(q, { idField: 'id' }) as Observable<Favorito[]>;
+    return this.user$.pipe(
+      switchMap(currentUser => {
+        if (!currentUser) {
+          return of([]); // Si no hay sesión iniciada, retorna un arreglo vacío al instante
+        }
+        const favoritosCollection = collection(this.firestore, 'favoritos');
+        // Filtra estrictamente por el UID del usuario activo
+        const q = query(favoritosCollection, where('userId', '==', currentUser.uid));
+        return collectionData(q, { idField: 'id' }) as Observable<Favorito[]>;
+      })
+    );
   }
 
   addFavorito(favorito: Favorito) {
-    const user = this.auth.currentUser;
+    const currentUser = this.auth.currentUser;
     const favoritosCollection = collection(this.firestore, 'favoritos');
     return addDoc(favoritosCollection, {
       ...favorito,
-      userId: user ? user.uid : 'anonimo'
+      userId: currentUser ? currentUser.uid : 'anonimo'
     });
   }
 

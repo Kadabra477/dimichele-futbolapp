@@ -32,7 +32,7 @@ export class LoginComponent {
     this.authService.login(this.email, this.password)
       .then(() => {
         this.cargando = false;
-        this.router.navigate(['/favoritos']);
+        this.router.navigate(['/partidos']); // Redirige correctamente al listado de partidos
       })
       .catch((error: any) => {
         this.cargando = false;

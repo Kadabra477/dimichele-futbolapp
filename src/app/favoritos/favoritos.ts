@@ -3,6 +3,8 @@ import { FavoritosService, Favorito } from '../services/favoritos.service';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AsyncPipe, CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { Auth, user } from '@angular/fire/auth';
 import jsPDF from 'jspdf';
 
 @Component({
@@ -14,14 +16,28 @@ import jsPDF from 'jspdf';
 })
 export class FavoritosComponent implements OnInit {
   private favoritosService = inject(FavoritosService);
+  private auth = inject(Auth);
+  private router = inject(Router);
+
   favoritos$!: Observable<Favorito[]>;
   private listaFavoritosActuales: Favorito[] = []; 
   
+  usuarioLogueado = false;
   nuevoNombre = ''; 
   nuevoTipo = 'Equipo'; 
   editandoId: string | null = null;
 
   ngOnInit() { 
+    // Escuchamos el estado del usuario en tiempo real
+    user(this.auth).subscribe(currentUser => {
+      this.usuarioLogueado = !!currentUser;
+      
+      // Si el usuario cierra sesión estando en la vista de favoritos, lo mandamos a partidos
+      if (!currentUser) {
+        this.router.navigate(['/partidos']);
+      }
+    });
+
     this.favoritos$ = this.favoritosService.getFavoritos();
     this.favoritos$.subscribe(favs => {
       this.listaFavoritosActuales = favs;
@@ -34,6 +50,7 @@ export class FavoritosComponent implements OnInit {
   }
 
   guardar() {
+    if (!this.usuarioLogueado) return;
     if (!this.nuevoNombre.trim()) return;
     if (this.editandoId) {
       this.favoritosService.updateFavorito(this.editandoId, { nombre: this.nuevoNombre, tipo: this.nuevoTipo });
@@ -46,19 +63,21 @@ export class FavoritosComponent implements OnInit {
   }
 
   editar(fav: Favorito) { 
+    if (!this.usuarioLogueado) return;
     this.nuevoNombre = fav.nombre; 
     this.nuevoTipo = fav.tipo; 
     this.editandoId = fav.id!; 
   }
   
   eliminar(id: string) { 
+    if (!this.usuarioLogueado) return;
     if(confirm('¿Eliminar favorito?')) {
       this.favoritosService.deleteFavorito(id);
     } 
   }
 
   exportarPDF() {
-    if (!this.tieneFavoritos) return; // Evita exportar si está vacío
+    if (!this.tieneFavoritos || !this.usuarioLogueado) return;
     const doc = new jsPDF();
 
     doc.setFont("helvetica", "bold");
