@@ -43,16 +43,19 @@
 
       <!-- Botones de Acción -->
       <div class="pt-2 flex flex-col sm:flex-row gap-3">
-        <button type="button" (click)="iniciarSesion()" [disabled]="cargando"
+        <button type="button" (click)="iniciarSesion()" [disabled]="cargandoLogin || cargandoRegistro"
                 class="flex-1 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] disabled:opacity-50 text-white text-sm font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
-          @if (cargando) {
+          @if (cargandoLogin) {
             <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           }
           Ingresar
         </button>
         
-        <button type="button" (click)="registrarse()" [disabled]="cargando"
-                class="flex-1 bg-[#1f2937] hover:bg-slate-700 active:scale-[0.98] disabled:opacity-50 text-slate-200 text-sm font-bold py-3 px-4 rounded-xl border border-slate-700 transition-all flex items-center justify-center">
+        <button type="button" (click)="registrarse()" [disabled]="cargandoLogin || cargandoRegistro"
+                class="flex-1 bg-[#1f2937] hover:bg-slate-700 active:scale-[0.98] disabled:opacity-50 text-slate-200 text-sm font-bold py-3 px-4 rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2">
+          @if (cargandoRegistro) {
+            <span class="w-4 h-4 border-2 border-slate-200 border-t-transparent rounded-full animate-spin"></span>
+          }
           Registrarse
         </button>
       </div>

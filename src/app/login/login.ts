@@ -15,7 +15,8 @@ export class LoginComponent {
   email = ''; 
   password = '';
   errorMessage = '';
-  cargando = false;
+  cargandoLogin = false;
+  cargandoRegistro = false;
   
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -30,19 +31,19 @@ export class LoginComponent {
     }
 
     this.errorMessage = '';
-    this.cargando = true;
+    this.cargandoLogin = true;
 
     this.authService.login(emailLimpio, this.password)
       .then(() => {
-        this.cargando = false;
+        this.cargandoLogin = false;
         this.cdr.detectChanges();
         this.router.navigate(['/partidos']); // Redirige correctamente al listado de partidos
       })
       .catch((error: any) => {
         console.error('Error en login:', error);
-        this.cargando = false;
+        this.cargandoLogin = false;
         this.errorMessage = this.formatearErrorFirebase(error.code);
-        this.cdr.detectChanges(); // Fuerza a Angular a quitar el spinner y mostrar el error
+        this.cdr.detectChanges();
       });
   }
 
@@ -60,20 +61,20 @@ export class LoginComponent {
     }
 
     this.errorMessage = '';
-    this.cargando = true;
+    this.cargandoRegistro = true;
 
     this.authService.registro(emailLimpio, this.password)
       .then(() => {
-        this.cargando = false;
+        this.cargandoRegistro = false;
         this.cdr.detectChanges();
         alert('¡Registro exitoso! Ya puedes iniciar sesión con tus credenciales.');
         this.router.navigate(['/partidos']);
       })
       .catch((error: any) => {
         console.error('Error en registro:', error);
-        this.cargando = false;
+        this.cargandoRegistro = false;
         this.errorMessage = this.formatearErrorFirebase(error.code);
-        this.cdr.detectChanges(); // Fuerza a Angular a quitar el spinner y mostrar el error
+        this.cdr.detectChanges();
       });
   }
 
