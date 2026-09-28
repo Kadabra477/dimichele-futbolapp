@@ -6,7 +6,15 @@ export class AuthService {
   private auth = inject(Auth);
   public user$ = authState(this.auth);
 
-  registro(email: string, pass: string) { return createUserWithEmailAndPassword(this.auth, email, pass); }
-  login(email: string, pass: string) { return signInWithEmailAndPassword(this.auth, email, pass); }
-  logout() { return signOut(this.auth); }
+  registro(email: string, pass: string) {
+    return createUserWithEmailAndPassword(this.auth, email, pass);
+  }
+
+  login(email: string, pass: string) {
+    return signInWithEmailAndPassword(this.auth, email, pass);
+  }
+
+  logout() {
+    return signOut(this.auth);
+  }
 }

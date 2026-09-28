@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth';
 import { Router } from '@angular/router';
@@ -19,9 +19,12 @@ export class LoginComponent {
   
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   iniciarSesion(): void {
-    if (!this.email || !this.password) {
+    const emailLimpio = this.email.trim();
+
+    if (!emailLimpio || !this.password) {
       this.errorMessage = 'Por favor, completa todos los campos.';
       return;
     }
@@ -29,34 +32,48 @@ export class LoginComponent {
     this.errorMessage = '';
     this.cargando = true;
 
-    this.authService.login(this.email, this.password)
+    this.authService.login(emailLimpio, this.password)
       .then(() => {
         this.cargando = false;
+        this.cdr.detectChanges();
         this.router.navigate(['/partidos']); // Redirige correctamente al listado de partidos
       })
       .catch((error: any) => {
+        console.error('Error en login:', error);
         this.cargando = false;
         this.errorMessage = this.formatearErrorFirebase(error.code);
+        this.cdr.detectChanges(); // Fuerza a Angular a quitar el spinner y mostrar el error
       });
   }
 
   registrarse(): void {
-    if (!this.email || !this.password) {
+    const emailLimpio = this.email.trim();
+
+    if (!emailLimpio || !this.password) {
       this.errorMessage = 'Por favor, completa todos los campos para registrarte.';
+      return;
+    }
+
+    if (this.password.length < 6) {
+      this.errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
       return;
     }
 
     this.errorMessage = '';
     this.cargando = true;
 
-    this.authService.registro(this.email, this.password)
+    this.authService.registro(emailLimpio, this.password)
       .then(() => {
         this.cargando = false;
+        this.cdr.detectChanges();
         alert('¡Registro exitoso! Ya puedes iniciar sesión con tus credenciales.');
+        this.router.navigate(['/partidos']);
       })
       .catch((error: any) => {
+        console.error('Error en registro:', error);
         this.cargando = false;
         this.errorMessage = this.formatearErrorFirebase(error.code);
+        this.cdr.detectChanges(); // Fuerza a Angular a quitar el spinner y mostrar el error
       });
   }
 
@@ -74,7 +91,11 @@ export class LoginComponent {
       case 'auth/weak-password':
         return 'La contraseña debe tener al menos 6 caracteres.';
       case 'auth/invalid-credential':
-        return 'Credenciales inválidas. Verifica tu correo o contraseña.';
+        return 'La cuenta no existe o los datos ingresados son incorrectos.';
+      case 'auth/operation-not-allowed':
+        return 'El inicio de sesión con correo y contraseña no está habilitado en Firebase.';
+      case 'auth/too-many-requests':
+        return 'Demasiados intentos fallidos. Por favor, intenta más tarde.';
       default:
         return 'Ocurrió un error inesperado. Inténtalo de nuevo.';
     }
