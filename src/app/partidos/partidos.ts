@@ -60,32 +60,11 @@ export class PartidosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Monitoreamos el estado de la sesión del usuario
-    user(this.auth).subscribe(firebaseUser => {
-      this.usuarioLogueado = !!firebaseUser;
-      
-      if (this.usuarioLogueado) {
-        this.favoritosService.getFavoritos().subscribe((favs: Favorito[]) => {
-          this.nombresEquiposFavoritos = favs
-            .filter(f => f.tipo.toLowerCase() === 'equipo')
-            .map(f => f.nombre.toLowerCase().trim());
+    // 1. Activamos el buscador reactivo de inmediato
+    this.escucharBuscador();
 
-          this.nombresLigasFavoritas = favs
-            .filter(f => f.tipo.toLowerCase() === 'liga')
-            .map(f => f.nombre.toLowerCase().trim());
-
-          this.filtrarTodo();
-        });
-      } else {
-        this.nombresEquiposFavoritos = [];
-        this.nombresLigasFavoritas = [];
-        if (this.continenteSeleccionado === 'FAVORITOS') {
-          this.continenteSeleccionado = 'TODOS';
-        }
-        this.filtrarTodo();
-      }
-    });
-
+    // 2. Solicitamos los partidos de la API inmediatamente sin bloquearnos con Firebase
+    this.cargando = true;
     this.futbolService.obtenerPartidosDeHoy().subscribe({
       next: (res: any) => {
         const listaRaw = res.response || [];
@@ -128,11 +107,36 @@ export class PartidosComponent implements OnInit {
 
         this.filtrarTodo();
         this.cargando = false;
-        this.escucharBuscador();
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error al conectar con la API:', err);
         this.cargando = false;
+      }
+    });
+
+    // 3. Monitoreamos la sesión de usuario en paralelo para manejar favoritos
+    user(this.auth).subscribe(firebaseUser => {
+      this.usuarioLogueado = !!firebaseUser;
+      
+      if (this.usuarioLogueado) {
+        this.favoritosService.getFavoritos().subscribe((favs: Favorito[]) => {
+          this.nombresEquiposFavoritos = favs
+            .filter(f => f.tipo.toLowerCase() === 'equipo')
+            .map(f => f.nombre.toLowerCase().trim());
+
+          this.nombresLigasFavoritas = favs
+            .filter(f => f.tipo.toLowerCase() === 'liga')
+            .map(f => f.nombre.toLowerCase().trim());
+
+          this.filtrarTodo();
+        });
+      } else {
+        this.nombresEquiposFavoritos = [];
+        this.nombresLigasFavoritas = [];
+        if (this.continenteSeleccionado === 'FAVORITOS') {
+          this.continenteSeleccionado = 'TODOS';
+        }
+        this.filtrarTodo();
       }
     });
   }
