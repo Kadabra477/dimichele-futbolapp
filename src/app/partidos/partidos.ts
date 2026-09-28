@@ -60,10 +60,13 @@ export class PartidosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Iniciamos el buscador reactivo
+    // 1. Iniciamos el buscador reactivo de inmediato
     this.escucharBuscador();
 
-    // 2. Monitoreamos la sesión de usuario en paralelo
+    // 2. Cargamos los partidos de la API obligatoriamente al iniciar (Independiente de Firebase)
+    this.cargarPartidosAPI();
+
+    // 3. Monitoreamos la sesión de usuario en paralelo para los favoritos
     user(this.auth).subscribe(firebaseUser => {
       this.usuarioLogueado = !!firebaseUser;
       
@@ -77,7 +80,6 @@ export class PartidosComponent implements OnInit {
             .filter(f => f.tipo.toLowerCase() === 'liga')
             .map(f => f.nombre.toLowerCase().trim());
 
-          // Si ya tenemos partidos cargados, refrescamos el filtrado con los favoritos
           if (this.partidosGlobales.length > 0) {
             this.filtrarTodo();
           }
@@ -93,8 +95,9 @@ export class PartidosComponent implements OnInit {
         }
       }
     });
+  }
 
-    // 3. Cargamos los partidos principales obligatoriamente al iniciar
+  cargarPartidosAPI(): void {
     this.cargando = true;
     this.futbolService.obtenerPartidosDeHoy().subscribe({
       next: (res: any) => {
