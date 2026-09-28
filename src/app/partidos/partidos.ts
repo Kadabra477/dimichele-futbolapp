@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FutbolService } from '../services/futbol.service';
 import { FavoritosService, Favorito } from '../services/favoritos.service';
@@ -18,6 +18,7 @@ import { Auth, user } from '@angular/fire/auth';
 export class PartidosComponent implements OnInit {
   private favoritosService = inject(FavoritosService);
   private auth = inject(Auth);
+  private cdr = inject(ChangeDetectorRef); // Inyectamos el detector de cambios
   
   usuarioLogueado: boolean = false;
   
@@ -60,10 +61,10 @@ export class PartidosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Iniciamos el buscador reactivo de inmediato
+    // 1. Iniciamos el buscador reactivo
     this.escucharBuscador();
 
-    // 2. Cargamos los partidos de la API obligatoriamente al iniciar (Independiente de Firebase)
+    // 2. Cargamos los partidos de la API inmediatamente al montar el componente
     this.cargarPartidosAPI();
 
     // 3. Monitoreamos la sesión de usuario en paralelo para los favoritos
@@ -82,6 +83,7 @@ export class PartidosComponent implements OnInit {
 
           if (this.partidosGlobales.length > 0) {
             this.filtrarTodo();
+            this.cdr.detectChanges(); // Forzamos actualización visual con favoritos
           }
         });
       } else {
@@ -92,6 +94,7 @@ export class PartidosComponent implements OnInit {
         }
         if (this.partidosGlobales.length > 0) {
           this.filtrarTodo();
+          this.cdr.detectChanges();
         }
       }
     });
@@ -139,13 +142,16 @@ export class PartidosComponent implements OnInit {
           };
         });
 
-        // Forzamos el pintado inmediato de los partidos en pantalla
         this.filtrarTodo();
         this.cargando = false;
+        
+        // ¡Crucial! Forzamos a Angular a redibujar la pantalla de inmediato al recibir los datos
+        this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error al conectar con la API:', err);
         this.cargando = false;
+        this.cdr.detectChanges(); // Para quitar el estado de carga y mostrar errores si los hay
       }
     });
   }
