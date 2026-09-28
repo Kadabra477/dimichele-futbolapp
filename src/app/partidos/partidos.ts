@@ -6,7 +6,7 @@ import { PartidoFormateado, LigaAgrupada } from '../models/futbol.model';
 import { ComentariosComponent } from '../comentarios/comentarios';
 import { debounceTime, startWith } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Auth, user } from '@angular/fire/auth'; // <--- Importamos Firebase Auth
+import { Auth, user } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-partidos',
@@ -17,9 +17,9 @@ import { Auth, user } from '@angular/fire/auth'; // <--- Importamos Firebase Aut
 })
 export class PartidosComponent implements OnInit {
   private favoritosService = inject(FavoritosService);
-  private auth = inject(Auth); // <--- Inyectamos el servicio de autenticación
+  private auth = inject(Auth);
   
-  usuarioLogueado: boolean = false; // <--- Variable para controlar la sesión
+  usuarioLogueado: boolean = false;
   
   formularioFiltro: FormGroup;
   partidosGlobales: PartidoFormateado[] = [];
@@ -60,10 +60,41 @@ export class PartidosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Activamos el buscador reactivo de inmediato
+    // 1. Iniciamos el buscador reactivo
     this.escucharBuscador();
 
-    // 2. Solicitamos los partidos de la API inmediatamente sin bloquearnos con Firebase
+    // 2. Monitoreamos la sesión de usuario en paralelo
+    user(this.auth).subscribe(firebaseUser => {
+      this.usuarioLogueado = !!firebaseUser;
+      
+      if (this.usuarioLogueado) {
+        this.favoritosService.getFavoritos().subscribe((favs: Favorito[]) => {
+          this.nombresEquiposFavoritos = favs
+            .filter(f => f.tipo.toLowerCase() === 'equipo')
+            .map(f => f.nombre.toLowerCase().trim());
+
+          this.nombresLigasFavoritas = favs
+            .filter(f => f.tipo.toLowerCase() === 'liga')
+            .map(f => f.nombre.toLowerCase().trim());
+
+          // Si ya tenemos partidos cargados, refrescamos el filtrado con los favoritos
+          if (this.partidosGlobales.length > 0) {
+            this.filtrarTodo();
+          }
+        });
+      } else {
+        this.nombresEquiposFavoritos = [];
+        this.nombresLigasFavoritas = [];
+        if (this.continenteSeleccionado === 'FAVORITOS') {
+          this.continenteSeleccionado = 'TODOS';
+        }
+        if (this.partidosGlobales.length > 0) {
+          this.filtrarTodo();
+        }
+      }
+    });
+
+    // 3. Cargamos los partidos principales obligatoriamente al iniciar
     this.cargando = true;
     this.futbolService.obtenerPartidosDeHoy().subscribe({
       next: (res: any) => {
@@ -105,38 +136,13 @@ export class PartidosComponent implements OnInit {
           };
         });
 
+        // Forzamos el pintado inmediato de los partidos en pantalla
         this.filtrarTodo();
         this.cargando = false;
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error al conectar con la API:', err);
         this.cargando = false;
-      }
-    });
-
-    // 3. Monitoreamos la sesión de usuario en paralelo para manejar favoritos
-    user(this.auth).subscribe(firebaseUser => {
-      this.usuarioLogueado = !!firebaseUser;
-      
-      if (this.usuarioLogueado) {
-        this.favoritosService.getFavoritos().subscribe((favs: Favorito[]) => {
-          this.nombresEquiposFavoritos = favs
-            .filter(f => f.tipo.toLowerCase() === 'equipo')
-            .map(f => f.nombre.toLowerCase().trim());
-
-          this.nombresLigasFavoritas = favs
-            .filter(f => f.tipo.toLowerCase() === 'liga')
-            .map(f => f.nombre.toLowerCase().trim());
-
-          this.filtrarTodo();
-        });
-      } else {
-        this.nombresEquiposFavoritos = [];
-        this.nombresLigasFavoritas = [];
-        if (this.continenteSeleccionado === 'FAVORITOS') {
-          this.continenteSeleccionado = 'TODOS';
-        }
-        this.filtrarTodo();
       }
     });
   }
